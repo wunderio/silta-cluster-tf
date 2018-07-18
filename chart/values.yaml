@@ -1,0 +1,7 @@
+
+
+nfs-server-provisioner:
+  persistence:
+    enabled: true
+    storageClass: standard
+    size: 10Gi
