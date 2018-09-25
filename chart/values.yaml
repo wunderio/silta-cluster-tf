@@ -5,3 +5,5 @@ nfs-server-provisioner:
     enabled: true
     storageClass: standard
     size: 10Gi
+  storageClass:
+    defaultClass: false
