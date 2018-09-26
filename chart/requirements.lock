@@ -2,5 +2,8 @@ dependencies:
 - name: nfs-server-provisioner
   repository: https://kubernetes-charts.storage.googleapis.com/
   version: 0.1.5
-digest: sha256:49df016290bd68bb10cbb2f0564f020a64aa800aded2f8086b76efa2c4c06126
-generated: 2018-07-18T15:36:05.688542758+02:00
+- name: ambassador
+  repository: https://www.getambassador.io
+  version: 0.39.0
+digest: sha256:6c56628898b95d86e5357e3da07eae3597e006bdbbe48c8c5d0862eb626cb465
+generated: 2018-09-25T21:41:12.074660076+02:00
