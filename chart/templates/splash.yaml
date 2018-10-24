@@ -18,6 +18,7 @@ metadata:
       prefix: /robots.txt
       rewrite: /robots/deny/robots.txt
       service: {{ .Release.Name }}-splash:80
+      precedence: 10
 spec:
   type: NodePort
   ports:
