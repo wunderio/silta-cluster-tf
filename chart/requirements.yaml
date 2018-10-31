@@ -3,5 +3,5 @@ dependencies:
   version: 0.1.x
   repository: https://kubernetes-charts.storage.googleapis.com/
 - name: ambassador
-  version: 0.39.x
+  version: 0.40.x
   repository: https://www.getambassador.io
