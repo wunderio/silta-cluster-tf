@@ -29,8 +29,8 @@ spec:
           - containerPort: 22
         env:
           - name: GITAUTH_API_TOKEN
-            value: "{{ .Values.gitAuth.apiToken }}"
+            value: {{ required "A valid .Values.gitAuth.apiToken entry required!" .Values.gitAuth.apiToken | quote }}
           - name: GITAUTH_HOST
-            value: "{{ .Values.gitAuth.host }}"
+            value: {{ required "A valid .Values.gitAuth.apiToken entry required!" .Values.gitAuth.host | quote }}
           - name: GITAUTH_ORGANISATION
-            value: "{{ .Values.gitAuth.organisation }}"
+            value: {{ required "A valid .Values.gitAuth.apiToken entry required!" .Values.gitAuth.organisation | quote }}
