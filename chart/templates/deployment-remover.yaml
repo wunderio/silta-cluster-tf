@@ -35,7 +35,7 @@ spec:
       initContainers:
       - name: wait-redis
         image: busybox
-        command: ["sh", "-c", "until nslookup {{ .Release.Name }}-redis-master; do echo waiting for redis; sleep 2; done;"]
+        command: ["sh", "-c", "until echo PING | nc {{ .Release.Name }}-redis-master 6379; do echo waiting for redis; sleep 2; done;"]
       containers:
       - name: {{ .Release.Name }}-deployment-remover
         image: wunderio/silta-deployment-remover:v0.1
