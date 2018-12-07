@@ -41,6 +41,7 @@ spec:
         image: wunderio/silta-deployment-remover:v0.1
         ports:
           - containerPort: 80
+        imagePullPolicy: Always
         env:
           - name: WEBHOOKS_SECRET
             value: {{ required "A valid .Values.deploymentRemover.webhooksSecret entry required!" .Values.deploymentRemover.webhooksSecret | quote }}
