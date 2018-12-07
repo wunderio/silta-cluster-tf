@@ -35,7 +35,12 @@ spec:
       initContainers:
       - name: wait-redis
         image: busybox
-        command: ["sh", "-c", "until nslookup {{ .Release.Name }}-redis-master; do echo waiting for redis; sleep 2; done;"]
+        command: ['sh', '-c', 'until echo -e "AUTH $REDIS_PASSWORD\nPING" | nc $REDIS_HOST 6379; do echo waiting for redis; sleep 2; done;']
+        env:
+          - name: REDIS_HOST
+            value: {{ .Release.Name }}-redis-master
+          - name: REDIS_PASSWORD
+            value: {{ required "A valid .Values.redis.password entry required!" .Values.redis.password | quote }}
       containers:
       - name: {{ .Release.Name }}-deployment-remover
         image: wunderio/silta-deployment-remover:v0.1
