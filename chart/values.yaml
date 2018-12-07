@@ -34,3 +34,13 @@ redis:
   cluster:
     enabled: 0
     slaveCount: 0
+
+# Filebeat settings
+filebeat:
+  version: ''
+  elasticCloudId: ''
+  elasticsearchHost: ''
+  elasticsearchPort: ''
+  elasticsearchUsername: ''
+  elasticsearchPassword: ''
+  elasticsearchCloudAuth: ''
