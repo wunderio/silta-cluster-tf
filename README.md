@@ -4,8 +4,24 @@
 
 1. Copy `chart/values.yaml` to `local-values.yaml` and fill out information.
 
-2. Deploy chart to cluster using local values. 
+2. Check and create roles for filebeat if not already present
+(Not managed via Helm as elevated privileges are needed to create service accounts)
+Check: 
 ```
+kubectl get serviceaccount filebeat
+kubectl get ClusterRole filebeat
+kubectl get ClusterRoleBinding filebeat
+```
+
+Create:
+```
+kubectl --username=admin --password=<yourpassword> create -f filebeat-roles.yaml
+```
+
+3. Deploy chart to cluster using local values. 
+```
+helm repo add datawire https://www.getambassador.io
+helm dep update chart/
 helm upgrade --install --wait silta-cluster chart/  --values local-values.yaml
 ```
 
@@ -16,7 +32,7 @@ helm upgrade --install --wait silta-cluster chart/  --values local-values.yaml
 
 ```
 helm repo add datawire https://www.getambassador.io
-helm dep update
+helm dep update chart/
 helm upgrade --install --wait silta-cluster chart/  --values local-values.yaml
 ```
 
