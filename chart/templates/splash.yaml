@@ -50,3 +50,7 @@ spec:
       containers:
       - image: "wunderio/silta-splash"
         name: nginx
+        resources:
+          requests:
+            cpu: 10m
+            memory: 10M
