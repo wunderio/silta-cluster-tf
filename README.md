@@ -1,10 +1,40 @@
 # silta cluster
 
-### Installing
+## Installing
 
-1. Copy `chart/values.yaml` to `local-values.yaml` and fill out information.
+1. Create project and service account at - [Service Account creation](https://console.cloud.google.com/projectselector/iam-admin/serviceaccounts?supportedpurview=project&project=&folder=&organizationId=)
 
-2. Check and create roles for filebeat if not already present
+Create service account JSON key and save it as `gcloud-credentials.json` file. The file is excluded from repository.
+
+2. Copy https://github.com/wunderio/charts/silta-cluster/values.yaml to `local-values.yaml` and customize information to fit your organisation.
+
+### Setup using terraform
+
+2. Create google cloud storage bucket for terraform state file (see `bucket` and `gke_project_id` in `terraform.tf`) - [Google Cloud Platform Storage](https://console.cloud.google.com/storage/browser)
+
+2. Customize `terraform.tfvars` to fit your organisation.
+
+3. Set cluster name as `prefix` in `terraform.tf`.
+
+4. Run terraform
+```
+terraform init
+terraform plan -out=terraform.tfplan
+terraform apply "terraform.tfplan"
+```
+
+@TODO: filebeat
+
+#### Updates
+
+```
+terraform plan -out=terraform.tfplan
+terraform apply "terraform.tfplan"
+```
+
+### Manual setup
+
+1. Check and create roles for filebeat if not already present
 (Not managed via Helm as elevated privileges are needed to create service accounts)
 Check: 
 ```
@@ -18,6 +48,8 @@ Create:
 kubectl --username=admin --password=<yourpassword> create -f filebeat-roles.yaml
 ```
 
+2. Create GKE cluster
+
 3. Deploy chart to cluster using local values. 
 ```
 helm repo add datawire https://www.getambassador.io
@@ -25,8 +57,8 @@ helm dep update chart/
 helm upgrade --install --wait silta-cluster chart/  --values local-values.yaml
 ```
 
+#### Manual updates
 
-### Updating
 - Change `chart/requirements.yaml` ambassador version to an updated one.
 - Get the gitAuth parameters (organisation and API token) at hand.
 
@@ -35,13 +67,3 @@ helm repo add datawire https://www.getambassador.io
 helm dep update chart/
 helm upgrade --install --wait silta-cluster chart/  --values local-values.yaml
 ```
-
-#### SSH Jumphost
-
-SSH Jumphost authentication is based on [sshd-gitAuth](https://github.com/wunderio/sshd-gitauth) project that will authorize users based on their SSH private key. The key whitelist is built by listing all users that belong to a certain github organisation.
-
-You need to supply Github API Personal access token that will be used to get the list of organisation users. The access can be read only, following permissions are sufficient for the task: `public_repo, read:org, read:public_key, repo:status`.
-
-#### Deployment remover
-
-This is an exposed webhook that listens for branch delete events, logs in to cluster and removes named deployments using helm. Project code can be inspected at [silta-deployment-remover](https://github.com/wunderio/silta-deployment-remover).
