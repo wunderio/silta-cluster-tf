@@ -3,6 +3,7 @@
 
 # Terraform
 .terraform
+terraform.tfplan
 gcloud-credentials.json
 
 # Helm

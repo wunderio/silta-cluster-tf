@@ -16,6 +16,8 @@ provider "kubernetes" {
 }
 
 provider "helm" {
+
+  # TODO: Destroy is broken. Watch out for any changes in this PR: https://github.com/terraform-providers/terraform-provider-helm/pull/203
   install_tiller  = true
   namespace       = "kube-system"
   service_account = "tiller"
@@ -40,6 +42,24 @@ resource "helm_release" "silta_cluster" {
   repository = "https://wunderio.github.io/charts/"
   chart = "silta-cluster"
   values = ["${var.silta_cluster_helm_local_values}"]
+
+  set {
+    name = "gke.keyJSON"
+    value = "${var.gke_credentials}"
+  }
+  set {
+    name = "gke.projectName"
+    value = "${var.gke_project_id}"
+  }
+  set {
+    name = "gke.clusterName"
+    value = "${var.gke_cluster_name}"
+  }
+  set {
+    name = "gke.computeZone"
+    value = "${var.gke_zone}"
+  }
+
 
   # depends_on = [ "null_resource.helm_depupdate", "kubernetes_cluster_role_binding.tiller" ]
   depends_on = [ "kubernetes_cluster_role_binding.tiller" ]
