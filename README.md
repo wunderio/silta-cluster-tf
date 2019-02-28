@@ -10,7 +10,7 @@ Create service account JSON key and save it as `gcloud-credentials.json` file. T
 
 ### Setup using terraform
 
-2. Create google cloud storage bucket for terraform state file (see `bucket` and `gke_project_id` in `terraform.tf`) - [Google Cloud Platform Storage](https://console.cloud.google.com/storage/browser)
+2. Create google cloud storage bucket for shared terraform state file (see `bucket` and `gke_project_id` in `terraform.tf`) - [Google Cloud Platform Storage](https://console.cloud.google.com/storage/browser)
 
 2. Customize `terraform.tfvars` to fit your organisation.
 
@@ -22,8 +22,6 @@ terraform init
 terraform plan -out=terraform.tfplan
 terraform apply "terraform.tfplan"
 ```
-
-@TODO: filebeat resources. 
 
 #### Updates
 
