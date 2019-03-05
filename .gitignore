@@ -1,3 +1,11 @@
-chart/charts
+# IDE
 .idea
+
+# Terraform
+.terraform
+terraform.tfplan
+gcloud-credentials.json
+
+# Helm
 local-values.yaml
+
