@@ -39,7 +39,7 @@ provider "helm" {
 resource "helm_release" "silta_cluster" {
 
   name = "silta-cluster"
-  repository = "https://wunderio.github.io/charts/"
+  #repository = "https://wunderio.github.io/charts/"
   chart = "silta-cluster"
   values = ["${var.silta_cluster_helm_local_values}"]
 
@@ -59,7 +59,7 @@ resource "helm_release" "silta_cluster" {
     name = "gke.computeZone"
     value = "${var.gke_zone}"
   }
-  depends_on = [ "kubernetes_cluster_role_binding.tiller", "kubernetes_cluster_role_binding.filebeat" ]
+  depends_on = [ "kubernetes_cluster_role_binding.tiller", "kubernetes_cluster_role_binding.filebeat", "kubernetes_cluster_role_binding.metricbeat" ]
 }
 
 resource "kubernetes_cluster_role_binding" "tiller" {
@@ -81,51 +81,6 @@ resource "kubernetes_cluster_role_binding" "tiller" {
     name = "cluster-admin"
   }
   depends_on = [ "kubernetes_service_account.tiller"]
-}
-
-resource "kubernetes_cluster_role_binding" "filebeat" {
-  metadata {
-    name = "filebeat"
-  }
-  subject {
-    kind = "ServiceAccount"
-    name = "filebeat"
-    namespace = "default"
-    api_group = ""
-  }
-  role_ref {
-    kind  = "ClusterRole"
-    name = "filebeat"
-    api_group = "rbac.authorization.k8s.io"
-  }
-  depends_on = [ "kubernetes_cluster_role.filebeat" ]
-}
-
-resource "kubernetes_cluster_role" "filebeat" {
-  metadata {
-    name = "filebeat",
-    labels {
-      k8s-app = "filebeat"
-    }
-  }
-  rule {
-    api_groups = [""]
-    resources  = ["namespaces", "pods"]
-    verbs      = ["get", "list", "watch"]
-  }
-  depends_on = [ "kubernetes_service_account.filebeat" ]
-}
-
-resource "kubernetes_service_account" "filebeat" {
-  metadata {
-    name      = "filebeat"
-    namespace = "default"
-    labels {
-      k8s-app = "filebeat"
-    }
-  }
-  automount_service_account_token = true
-  depends_on = [ "google_container_cluster.silta_cluster" ]
 }
 
 resource "kubernetes_service_account" "tiller" {

@@ -32,18 +32,22 @@ terraform apply "terraform.tfplan"
 
 ### Manual setup
 
-1. Check and create roles for filebeat if not already present
+1. Check and create roles for filebeat and metricbeat if not already present
 (Not managed via Helm as elevated privileges are needed to create service accounts)
 Check: 
 ```
 kubectl get serviceaccount filebeat
 kubectl get ClusterRole filebeat
 kubectl get ClusterRoleBinding filebeat
+kubectl get serviceaccount metricbeat
+kubectl get ClusterRole metricbeat
+kubectl get ClusterRoleBinding metricbeat
 ```
 
 Create:
 ```
 kubectl --username=admin --password=<yourpassword> create -f filebeat-roles.yaml
+kubectl --username=admin --password=<yourpassword> create -f metricbeat-roles.yaml
 ```
 
 2. Create GKE cluster
