@@ -5,7 +5,7 @@ resource "kubernetes_cluster_role_binding" "filebeat" {
   subject {
     kind = "ServiceAccount"
     name = "filebeat"
-    # namespace = "kube-system"
+    namespace = "default"
     api_group = ""
   }
   role_ref {
@@ -34,7 +34,7 @@ resource "kubernetes_cluster_role" "filebeat" {
 resource "kubernetes_service_account" "filebeat" {
   metadata {
     name      = "filebeat"
-    # namespace = "kube-system"
+    namespace = "default"
     labels {
       k8s-app = "filebeat"
     }

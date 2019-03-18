@@ -5,7 +5,7 @@ resource "kubernetes_cluster_role_binding" "metricbeat" {
   subject {
     kind = "ServiceAccount"
     name = "metricbeat"
-    # namespace = "kube-system"
+    namespace = "default"
     api_group = ""
   }
   role_ref {
@@ -44,7 +44,7 @@ resource "kubernetes_cluster_role" "metricbeat" {
 resource "kubernetes_service_account" "metricbeat" {
   metadata {
     name      = "metricbeat"
-    # namespace = "kube-system"
+    namespace = "default"
     labels {
       k8s-app = "metricbeat"
     }

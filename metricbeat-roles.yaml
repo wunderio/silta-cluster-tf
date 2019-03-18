@@ -6,6 +6,7 @@ metadata:
 subjects:
 - kind: ServiceAccount
   name: metricbeat
+  namespace: default
 roleRef:
   kind: ClusterRole
   name: metricbeat
