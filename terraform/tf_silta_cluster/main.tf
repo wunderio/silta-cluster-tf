@@ -18,10 +18,7 @@ provider "kubernetes" {
 provider "helm" {
 
   # TODO: Destroy is broken. Watch out for any changes in this PR: https://github.com/terraform-providers/terraform-provider-helm/pull/203
-  install_tiller  = true
   namespace       = "kube-system"
-  service_account = "tiller"
-  tiller_image    = "gcr.io/kubernetes-helm/tiller:v2.11.0"
   
   kubernetes {
     host = google_container_cluster.silta_cluster.endpoint
@@ -59,37 +56,6 @@ resource "helm_release" "silta_cluster" {
     name = "gke.computeZone"
     value = var.gke_zone
   }
-  depends_on = [ "kubernetes_cluster_role_binding.tiller", "kubernetes_cluster_role_binding.filebeat", "kubernetes_cluster_role_binding.metricbeat" ]
-}
-
-resource "kubernetes_cluster_role_binding" "tiller" {
-  metadata {
-    name = "tiller"
-  }
-  subject {
-    kind = "User"
-    name = "system:serviceaccount:kube-system:tiller"
-  }
-  subject {
-    kind = "ServiceAccount"
-    name = "tiller"
-    api_group = ""
-    namespace = "kube-system"
-  }
-  role_ref {
-    kind  = "ClusterRole"
-    name = "cluster-admin"
-  }
-  depends_on = [ "kubernetes_service_account.tiller"]
-}
-
-resource "kubernetes_service_account" "tiller" {
-  metadata {
-    name      = "tiller"
-    namespace = "kube-system"
-  }
-  automount_service_account_token = true
-  depends_on = [ "google_container_cluster.silta_cluster" ]
 }
 
 resource "google_container_node_pool" "np" {
