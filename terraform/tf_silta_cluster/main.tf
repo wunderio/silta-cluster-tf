@@ -5,14 +5,14 @@ provider "google" {
 }
 
 provider "kubernetes" {
-  host = "${google_container_cluster.silta_cluster.endpoint}"
+  host = google_container_cluster.silta_cluster.endpoint
   
-  username = "${google_container_cluster.silta_cluster.master_auth.0.username}"
-  password = "${google_container_cluster.silta_cluster.master_auth.0.password}"
+  username = google_container_cluster.silta_cluster.master_auth.0.username
+  password = google_container_cluster.silta_cluster.master_auth.0.password
 
-  client_certificate = "${base64decode(google_container_cluster.silta_cluster.master_auth.0.client_certificate)}"
-  client_key = "${base64decode(google_container_cluster.silta_cluster.master_auth.0.client_key)}"
-  cluster_ca_certificate = "${base64decode(google_container_cluster.silta_cluster.master_auth.0.cluster_ca_certificate)}"
+  client_certificate = base64decode(google_container_cluster.silta_cluster.master_auth.0.client_certificate)
+  client_key = base64decode(google_container_cluster.silta_cluster.master_auth.0.client_key)
+  cluster_ca_certificate = base64decode(google_container_cluster.silta_cluster.master_auth.0.cluster_ca_certificate)
 }
 
 provider "helm" {
@@ -24,15 +24,15 @@ provider "helm" {
   tiller_image    = "gcr.io/kubernetes-helm/tiller:v2.11.0"
   
   kubernetes {
-    host = "${google_container_cluster.silta_cluster.endpoint}"
+    host = google_container_cluster.silta_cluster.endpoint
     
-    username = "${google_container_cluster.silta_cluster.master_auth.0.username}"
-    password = "${google_container_cluster.silta_cluster.master_auth.0.password}"
+    username = google_container_cluster.silta_cluster.master_auth.0.username
+    password = google_container_cluster.silta_cluster.master_auth.0.password
 
-    #token = "${data.google_client_config.current.access_token}"
-    client_certificate = "${base64decode(google_container_cluster.silta_cluster.master_auth.0.client_certificate)}"
-    client_key = "${base64decode(google_container_cluster.silta_cluster.master_auth.0.client_key)}"
-    cluster_ca_certificate = "${base64decode(google_container_cluster.silta_cluster.master_auth.0.cluster_ca_certificate)}"
+    #token = data.google_client_config.current.access_token
+    client_certificate = base64decode(google_container_cluster.silta_cluster.master_auth.0.client_certificate)
+    client_key = base64decode(google_container_cluster.silta_cluster.master_auth.0.client_key)
+    cluster_ca_certificate = base64decode(google_container_cluster.silta_cluster.master_auth.0.cluster_ca_certificate)
   }
 }
 
@@ -45,19 +45,19 @@ resource "helm_release" "silta_cluster" {
 
   set {
     name = "gke.keyJSON"
-    value = "${var.gke_credentials}"
+    value = var.gke_credentials
   }
   set {
     name = "gke.projectName"
-    value = "${var.gke_project_id}"
+    value = var.gke_project_id
   }
   set {
     name = "gke.clusterName"
-    value = "${var.gke_cluster_name}"
+    value = var.gke_cluster_name
   }
   set {
     name = "gke.computeZone"
-    value = "${var.gke_zone}"
+    value = var.gke_zone
   }
   depends_on = [ "kubernetes_cluster_role_binding.tiller", "kubernetes_cluster_role_binding.filebeat", "kubernetes_cluster_role_binding.metricbeat" ]
 }
@@ -94,24 +94,24 @@ resource "kubernetes_service_account" "tiller" {
 
 resource "google_container_node_pool" "np" {
   name               = "pool-1"
-  zone               = "${var.gke_zone}"
-  cluster            = "${google_container_cluster.silta_cluster.name}"
+  zone               = var.gke_zone
+  cluster            = google_container_cluster.silta_cluster.name
   node_config {
     preemptible  = false
-    machine_type = "${var.gke_machine_type}"
+    machine_type = var.gke_machine_type
   }
-  node_count = "${var.gke_node_count}"
-  depends_on = ["google_container_cluster.silta_cluster"]
+  node_count = var.gke_node_count
+  depends_on = [google_container_cluster.silta_cluster]
 }
 
 resource "google_container_cluster" "silta_cluster" {
-  name = "${var.gke_cluster_name}"
-  zone = "${var.gke_zone}"
+  name = var.gke_cluster_name
+  zone = var.gke_zone
   remove_default_node_pool = true
-  "node_pool" = {
+  node_pool = {
     "name" = "default-pool"
   }
-  "lifecycle" = {
+  lifecycle = {
     "ignore_changes" = ["node_pool"]
   }
 }
