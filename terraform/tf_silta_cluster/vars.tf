@@ -4,10 +4,7 @@ variable "gke_credentials" {
 variable "gke_project_id" {
   type = string
 }
-variable "gke_region" {
-  type = string
-}
-variable "gke_zone" {
+variable "gke_location" {
   type = string
 }
 variable "gke_cluster_name" {
