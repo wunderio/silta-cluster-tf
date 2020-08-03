@@ -16,7 +16,7 @@ module "tf_silta_cluster" {
   gke_node_count = "2"
   silta_cluster_helm_local_values = "${file("local-values.yaml")}"
 
-  source = "github.com/wunderio/silta-cluster//terraform/tf_silta_cluster"
+  source = "git::https://@github.com/wunderio/silta-cluster-tf.git//terraform/tf_silta_cluster"
   # source = "./terraform/tf_silta_cluster"
   version = "0.1"
 }
