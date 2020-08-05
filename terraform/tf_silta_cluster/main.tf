@@ -23,19 +23,16 @@ provider "helm" {
   }
 }
 
-// The cert-manager release needs to be installed first, so that CRDs
-// are present when the silta-cluster release is created.
-resource "helm_release" "cert_manager" {
-  name = "cert-manager"
-  repository = "https://charts.jetstack.io"
-  chart = "cert-manager"
-  namespace = "cert-manager"
-  create_namespace = true
-
-  set {
-    name = "installCRDs"
-    value = true
+// The cert-manager helm chart requires some CRDs to be installed.
+resource "null_resource" "cert_manager" {
+  provisioner "local-exec" {
+    command = <<EOF
+kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.10/deploy/manifests/00-crds.yaml
+(kubectl get namespace silta-cluster && kubectl label namespace silta-cluster certmanager.k8s.io/disable-validation="true") || true
+EOF
   }
+
+  depends_on = [google_container_cluster.silta_cluster]
 }
 
 resource "helm_release" "silta_cluster" {
@@ -46,7 +43,7 @@ resource "helm_release" "silta_cluster" {
   namespace = "silta-cluster"
   create_namespace = true
   timeout = 900
-  depends_on = [helm_release.cert_manager]
+  depends_on = [null_resource.cert_manager]
 }
 
 
