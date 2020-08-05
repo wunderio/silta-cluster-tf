@@ -2,9 +2,9 @@
 
 ## Installing
 
-1. Create a Google Cloud project and note the project id.
+1. Create a Google Cloud project and note the project id. If you want want use GCS for storage, create a bucket.
 
-2. Make sure you have a user or service account set up locally with gcloud.
+2. Make sure you have a user or service account set up locally with gcloud which has access to the Google Cloud project and the GCS bucket.
 
 3. Copy https://github.com/wunderio/charts/silta-cluster/values.yaml to `local-values.yaml` and customize information to fit your organisation.
 
@@ -18,6 +18,12 @@ provider "google" {
 # Use the beta API where needed.
 provider "google-beta" {
   project = "my-silta-project"
+}
+
+terraform {
+  backend "gcs" {
+    bucket  = "my-silta-project-tf-state"
+  }
 }
 
 module "tf_silta_cluster" {
