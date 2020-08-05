@@ -70,6 +70,7 @@ resource "google_container_node_pool" "np" {
     preemptible = true
     machine_type = var.machine_type
   }
+  initial_node_count = 1
   autoscaling {
     min_node_count = var.min_node_count
     max_node_count = var.max_node_count
@@ -81,6 +82,7 @@ resource "google_container_node_pool" "static_ip" {
   name  = "static-ip"
   location = var.cluster_location
   cluster = google_container_cluster.silta_cluster.name
+  initial_node_count = 1
   node_config {
     preemptible = false
     machine_type = var.machine_type
