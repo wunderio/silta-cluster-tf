@@ -2,29 +2,43 @@
 
 ## Installing
 
-1. Create project and service account at - [Service Account creation](https://console.cloud.google.com/projectselector/iam-admin/serviceaccounts?supportedpurview=project&project=&folder=&organizationId=)
+1. Create a Google Cloud project and note the project id.
 
-Create service account JSON key and save it as `gcloud-credentials.json` file. The file is excluded from repository.
+2. Make sure you have a user or service account set up locally with gcloud.
 
-2. Copy https://github.com/wunderio/charts/silta-cluster/values.yaml to `local-values.yaml` and customize information to fit your organisation.
+3. Copy https://github.com/wunderio/charts/silta-cluster/values.yaml to `local-values.yaml` and customize information to fit your organisation.
 
-### Setup using terraform
+4. Call the terraform module with your own parameters:
 
-2. Create google cloud storage bucket for shared terraform state file (see `bucket` and `gke_project_id` in `terraform.tf`) - [Google Cloud Platform Storage](https://console.cloud.google.com/storage/browser)
+```hcl-terraform
+provider "google" {
+  project = "my-silta-project"
+}
 
-2. Customize `terraform.tfvars` to fit your organisation.
+# Use the beta API where needed.
+provider "google-beta" {
+  project = "my-silta-project"
+}
 
-3. Set cluster name as `prefix` in `terraform.tf`.
+module "tf_silta_cluster" {
+  # Use your Google Cloud project id. 
+  project_id = "my-silta-project"
+  
+  # The path to your values file for the release of the silta-cluster helm chart.
+  silta_cluster_helm_local_values = "local-values.yaml"
 
-4. Run terraform
+  source = "git::https://@github.com/wunderio/silta-cluster-tf.git//terraform/tf_silta_cluster"
+}
 ```
+
+5. Run terraform
+```bash
 terraform init
 terraform plan -out=terraform.tfplan
 terraform apply "terraform.tfplan"
 ```
 
-#### Updates
-
+6. Updating terraform
 ```
 terraform plan -out=terraform.tfplan
 terraform apply "terraform.tfplan"
