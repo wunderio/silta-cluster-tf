@@ -1,11 +1,3 @@
-provider "google" {
-  project = var.gke_project_id
-}
-
-# Use the beta API where needed.
-provider "google-beta" {
-  project = var.gke_project_id
-}
 
 provider "kubernetes" {
   host = google_container_cluster.silta_cluster.endpoint
