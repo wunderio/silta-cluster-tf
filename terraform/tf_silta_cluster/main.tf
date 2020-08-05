@@ -40,68 +40,50 @@ resource "helm_release" "cert_manager" {
 
 resource "helm_release" "silta_cluster" {
   name = "silta-cluster"
-  #repository = "https://wunderio.github.io/charts/"
+  repository = "https://storage.googleapis.com/charts.wdr.io"
   chart = "silta-cluster"
-  values = ["${var.silta_cluster_helm_local_values}"]
+  values = [file(var.silta_cluster_helm_local_values)]
   namespace = "silta-cluster"
   create_namespace = true
   timeout = 900
-
-  set {
-    name = "gke.keyJSON"
-    value = var.gke_credentials
-  }
-  set {
-    name = "gke.projectName"
-    value = var.gke_project_id
-  }
-  set {
-    name = "gke.clusterName"
-    value = var.gke_cluster_name
-  }
-  set {
-    name = "gke.computeZone"
-    value = var.gke_location
-  }
   depends_on = [helm_release.cert_manager]
 }
 
-resource "google_container_node_pool" "np" {
-  name  = "pool-1"
-  location = var.gke_location
-  cluster = google_container_cluster.silta_cluster.name
-  node_config {
-    preemptible = true
-    machine_type = var.gke_machine_type
-  }
-  node_count = var.gke_node_count
-  autoscaling {
-    min_node_count = 1
-    max_node_count = 10
-  }
-  depends_on = [google_container_cluster.silta_cluster]
-}
-
-resource "google_container_node_pool" "static_ip" {
-  name  = "static-ip"
-  location = var.gke_location
-  cluster = google_container_cluster.silta_cluster.name
-  node_config {
-    preemptible = false
-    machine_type = var.gke_machine_type
-  }
-  node_count = var.gke_node_count
-  depends_on = [google_container_cluster.silta_cluster]
-}
 
 resource "google_container_cluster" "silta_cluster" {
   provider = google-beta
-  name = var.gke_cluster_name
-  location = var.gke_location
+  name = var.cluster_name
+  location = var.cluster_location
   remove_default_node_pool = true
   initial_node_count = 1
 
   release_channel {
     channel = "REGULAR"
   }
+}
+
+resource "google_container_node_pool" "np" {
+  name  = "pool-1"
+  location = var.cluster_location
+  cluster = google_container_cluster.silta_cluster.name
+  node_config {
+    preemptible = true
+    machine_type = var.machine_type
+  }
+  autoscaling {
+    min_node_count = var.min_node_count
+    max_node_count = var.max_node_count
+  }
+  depends_on = [google_container_cluster.silta_cluster]
+}
+
+resource "google_container_node_pool" "static_ip" {
+  name  = "static-ip"
+  location = var.cluster_location
+  cluster = google_container_cluster.silta_cluster.name
+  node_config {
+    preemptible = false
+    machine_type = var.machine_type
+  }
+  depends_on = [google_container_cluster.silta_cluster]
 }
