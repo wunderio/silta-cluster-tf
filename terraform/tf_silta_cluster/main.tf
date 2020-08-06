@@ -33,10 +33,13 @@ resource "helm_release" "cert_manager_legacy_crds" {
   create_namespace = true
 }
 
-  set {
-    name = "installCRDs"
-    value = true
-  }
+resource "google_compute_address" "jumphost_ip" {
+  name = "ssh-jumphost"
+  address_type = "EXTERNAL"
+}
+resource "google_compute_address" "traefik_ingress" {
+  name = "traefik-ingress"
+  address_type = "EXTERNAL"
 }
 
 resource "helm_release" "silta_cluster" {
@@ -49,6 +52,15 @@ resource "helm_release" "silta_cluster" {
   timeout = 900
   depends_on = [helm_release.cert_manager_legacy_crds]
 
+  set {
+    name = "gitAuth.loadBalancerIP"
+    value = google_compute_address.jumphost_ip.address
+  }
+  set {
+    name = "traefik.loadBalancerIP"
+    value = google_compute_address.traefik_ingress.address
+  }
+}
 
 resource "google_container_cluster" "silta_cluster" {
   provider = google-beta
