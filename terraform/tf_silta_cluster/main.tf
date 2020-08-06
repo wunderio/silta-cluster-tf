@@ -25,12 +25,13 @@ provider "helm" {
 
 // The cert-manager release needs to be installed first, so that CRDs
 // are present when the silta-cluster release is created.
-resource "helm_release" "cert_manager" {
-  name = "cert-manager"
-  repository = "https://charts.jetstack.io"
-  chart = "cert-manager"
+resource "helm_release" "cert_manager_legacy_crds" {
+  name = "cert-manager-legacy-crds"
+  repository = "https://storage.googleapis.com/charts.wdr.io"
+  chart = "cert-manager-legacy-crds"
   namespace = "cert-manager"
   create_namespace = true
+}
 
   set {
     name = "installCRDs"
@@ -46,8 +47,7 @@ resource "helm_release" "silta_cluster" {
   namespace = "silta-cluster"
   create_namespace = true
   timeout = 900
-  depends_on = [helm_release.cert_manager]
-}
+  depends_on = [helm_release.cert_manager_legacy_crds]
 
 
 resource "google_container_cluster" "silta_cluster" {
