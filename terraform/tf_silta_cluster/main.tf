@@ -81,12 +81,18 @@ resource "google_container_node_pool" "np" {
   node_config {
     preemptible = true
     machine_type = var.machine_type
+    oauth_scopes = [
+      "https://www.googleapis.com/auth/devstorage.read_only",
+      "https://www.googleapis.com/auth/logging.write",
+      "https://www.googleapis.com/auth/monitoring",
+    ]
   }
   initial_node_count = 1
   autoscaling {
     min_node_count = var.min_node_count
     max_node_count = var.max_node_count
   }
+
   depends_on = [google_container_cluster.silta_cluster]
 }
 
@@ -98,6 +104,16 @@ resource "google_container_node_pool" "static_ip" {
   node_config {
     preemptible = false
     machine_type = var.machine_type
+    oauth_scopes = [
+      "https://www.googleapis.com/auth/devstorage.read_only",
+      "https://www.googleapis.com/auth/logging.write",
+      "https://www.googleapis.com/auth/monitoring",
+    ]
   }
+
   depends_on = [google_container_cluster.silta_cluster]
+}
+
+resource "google_container_registry" "registry" {
+  location = "EU"
 }
