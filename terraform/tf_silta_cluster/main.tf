@@ -122,8 +122,9 @@ output "dns_info" {
   value = <<EOF
 Please add DNS entries for the following domains:
 
-*.${yamldecode(file(var.silta_cluster_helm_local_values)).clusterDomain} pointing to ${google_compute_address.traefik_ingress.address}
-ssh.${yamldecode(file(var.silta_cluster_helm_local_values)).clusterDomain} pointing to ${google_compute_address.jumphost_ip.address}
+A ${yamldecode(file(var.silta_cluster_helm_local_values)).clusterDomain} pointing to ${google_compute_address.traefik_ingress.address}
+CNAME *.${yamldecode(file(var.silta_cluster_helm_local_values)).clusterDomain} pointing to ${yamldecode(file(var.silta_cluster_helm_local_values)).clusterDomain}
+A ssh.${yamldecode(file(var.silta_cluster_helm_local_values)).clusterDomain} pointing to ${google_compute_address.jumphost_ip.address}
 
 EOF
 }
