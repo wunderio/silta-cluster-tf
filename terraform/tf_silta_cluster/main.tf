@@ -99,6 +99,12 @@ resource "google_container_node_pool" "np" {
   depends_on = [google_container_cluster.silta_cluster]
 }
 
+resource "google_compute_address" "static_egress" {
+  for_each = toset(var.static_egress_ip_names)
+  name = each.value
+  address_type = "EXTERNAL"
+}
+
 resource "google_container_node_pool" "static_ip" {
   name  = "static-ip"
   location = var.cluster_location

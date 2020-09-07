@@ -28,3 +28,8 @@ variable "max_node_count" {
 variable "silta_cluster_helm_local_values" {
   type    = string
 }
+
+variable "static_egress_ip_names" {
+  type    = list(string)
+  default = ["static-egress-1", "static-egress-2"]
+}
