@@ -78,7 +78,7 @@ resource "google_container_cluster" "silta_cluster" {
 }
 
 resource "google_container_node_pool" "np" {
-  name  = "pool-1"
+  name  = "pool-${var.machine_type}"
   location = var.cluster_location
   cluster = google_container_cluster.silta_cluster.name
   node_config {
