@@ -53,7 +53,7 @@ resource "helm_release" "silta_cluster" {
   namespace = "silta-cluster"
   create_namespace = true
   timeout = 900
-  depends_on = [helm_release.cert_manager_legacy_crds]
+  depends_on = [helm_release.cert_manager_legacy_crds, google_container_node_pool.np, google_container_node_pool.static_ip]
 
   set {
     name = "gitAuth.loadBalancerIP"
