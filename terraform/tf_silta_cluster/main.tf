@@ -108,6 +108,8 @@ resource "google_compute_address" "static_egress" {
 resource "google_container_node_pool" "static_ip" {
   name  = "static-ip"
   location = var.cluster_location
+  // We only need static nodes in a single region.
+  node_locations = [element(tolist(google_container_cluster.silta_cluster.node_locations), 0)]
   cluster = google_container_cluster.silta_cluster.name
   initial_node_count = 1
   node_config {
