@@ -31,6 +31,9 @@ resource "helm_release" "cert_manager_legacy_crds" {
   chart = "cert-manager-legacy-crds"
   namespace = "cert-manager"
   create_namespace = true
+
+  // Only install when we have a node pool available.
+  depends_on = [google_container_node_pool.np]
 }
 
 resource "google_compute_address" "jumphost_ip" {
