@@ -75,6 +75,17 @@ resource "google_container_cluster" "silta_cluster" {
   release_channel {
     channel = "REGULAR"
   }
+
+  network_policy {
+    enabled = true
+    provider = "CALICO"
+  }
+
+  addons_config {
+    network_policy_config {
+      disabled = false
+    }
+  }
 }
 
 resource "google_container_node_pool" "np" {
