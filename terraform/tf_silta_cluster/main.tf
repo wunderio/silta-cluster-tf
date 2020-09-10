@@ -122,7 +122,8 @@ resource "google_container_node_pool" "static_ip" {
   // We only need static nodes in a single region.
   node_locations = [element(tolist(google_container_cluster.silta_cluster.node_locations), 0)]
   cluster = google_container_cluster.silta_cluster.name
-  initial_node_count = 1
+  initial_node_count = 2
+  node_count = 2
   node_config {
     preemptible = false
     machine_type = var.machine_type
