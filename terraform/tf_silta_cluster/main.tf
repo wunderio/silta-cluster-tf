@@ -137,8 +137,35 @@ resource "google_container_node_pool" "static_ip" {
   depends_on = [google_container_cluster.silta_cluster]
 }
 
+
 resource "google_container_registry" "registry" {
   location = "EU"
+}
+
+resource "null_resource" "static_ip_node_assignment" {
+
+  triggers = {
+    version = 1
+  }
+
+  provisioner "local-exec" {
+    command = <<EOF
+
+static_ip_addresses=(${join(" ", [for address in google_compute_address.static_egress: address.address])})
+instance_names=$(gcloud compute instances list --project ${var.project_id} --filter="name~'static-ip'" --format="value(name)")
+index=0
+for instance_name in $instance_names; do
+
+  static_ip_address=$${static_ip_addresses[index]}
+  # Delete the existing access-config
+  gcloud compute instances delete-access-config $instance_name --project ${var.project_id} --zone ${element(tolist(google_container_cluster.silta_cluster.node_locations), 0)} --access-config-name "external-nat" || true
+  # Create the new access-config
+  gcloud compute instances add-access-config $instance_name --project ${var.project_id} --zone ${element(tolist(google_container_cluster.silta_cluster.node_locations), 0)} --access-config-name "external-nat" --address $static_ip_address
+  index=$((index+1))
+done
+
+EOF
+  }
 }
 
 output "dns_info" {
@@ -149,5 +176,7 @@ A ${yamldecode(file(var.silta_cluster_helm_local_values)).clusterDomain} pointin
 CNAME *.${yamldecode(file(var.silta_cluster_helm_local_values)).clusterDomain} pointing to ${yamldecode(file(var.silta_cluster_helm_local_values)).clusterDomain}
 A ssh.${yamldecode(file(var.silta_cluster_helm_local_values)).clusterDomain} pointing to ${google_compute_address.jumphost_ip.address}
 
+Static egress IPs:
+${join("\n", [for address in google_compute_address.static_egress: address.address])}
 EOF
 }
