@@ -63,6 +63,18 @@ resource "helm_release" "silta_cluster" {
     name = "traefik.loadBalancerIP"
     value = google_compute_address.traefik_ingress.address
   }
+  set {
+    name = "gke.clusterName"
+    value = google_container_cluster.silta_cluster.name
+  }
+  set {
+    name = "gke.computeZone"
+    value = var.cluster_location
+  }
+  set {
+    name = "gke.keyJSON"
+    value = google_service_account_key.shared_storage_key.private_key
+  }
 }
 
 resource "google_container_cluster" "silta_cluster" {
