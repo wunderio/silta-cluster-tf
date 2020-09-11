@@ -160,6 +160,8 @@ resource "null_resource" "static_ip_node_assignment" {
 
   triggers = {
     version = 1
+    static_ip_addresses = join(" ", [for address in google_compute_address.static_egress: address.address])
+    static_node_pool = join(" ", google_container_node_pool.static_ip.instance_group_urls)
   }
 
   provisioner "local-exec" {
