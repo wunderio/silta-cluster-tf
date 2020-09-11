@@ -7,20 +7,19 @@ resource "google_storage_bucket" "shared-storage" {
   # force_destroy = true
 }
 
-resource "google_service_account" "shared-storage-sa" {
+resource "google_service_account" "shared_storage_sa" {
   account_id   = "shared-storage-sa"
   display_name = "Access to shared storage"
 }
 
-resource "google_storage_bucket_acl" "shared-storage-acl" {
+resource "google_storage_bucket_access_control" "shared_storage_access_rule" {
   bucket = google_storage_bucket.shared-storage.name
-
-  role_entity = [
-    "WRITER:user-${google_service_account.shared-storage-sa.email}",
-  ]
+  role   = "OWNER"
+  entity = "user-${google_service_account.shared_storage_sa.email}"
 }
 
+
 resource "google_service_account_key" "shared_storage_key" {
-  service_account_id = google_service_account.silta_ci.name
+  service_account_id = google_service_account.shared_storage_sa.name
   public_key_type    = "TYPE_X509_PEM_FILE"
 }
