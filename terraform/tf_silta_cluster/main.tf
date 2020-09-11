@@ -49,7 +49,14 @@ resource "helm_release" "silta_cluster" {
   name = "silta-cluster"
   repository = "https://storage.googleapis.com/charts.wdr.io"
   chart = "silta-cluster"
-  values = [file(var.silta_cluster_helm_local_values)]
+  values = [file(var.silta_cluster_helm_local_values), <<EOF
+gke:
+  projectName: ${var.project_id}
+  clusterName: ${google_container_cluster.silta_cluster.name}
+  computeZone: ${var.cluster_location}
+  keyJSON: '${base64decode(google_service_account_key.shared_storage_key.private_key)}'
+EOF
+  ]
   namespace = "silta-cluster"
   create_namespace = true
   timeout = 900
@@ -64,16 +71,12 @@ resource "helm_release" "silta_cluster" {
     value = google_compute_address.traefik_ingress.address
   }
   set {
-    name = "gke.clusterName"
-    value = google_container_cluster.silta_cluster.name
+    name = "csi-rclone.params.remote"
+    value = "google cloud storage"
   }
   set {
-    name = "gke.computeZone"
-    value = var.cluster_location
-  }
-  set {
-    name = "gke.keyJSON"
-    value = google_service_account_key.shared_storage_key.private_key
+    name = "csi-rclone.params.remotePath"
+    value = google_storage_bucket.shared-storage.name
   }
 }
 
