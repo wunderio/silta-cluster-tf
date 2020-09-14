@@ -54,6 +54,12 @@ resource "random_password" "db_root_pass" {
 resource "random_password" "db_user_pass" {
   length = 16
 }
+
+variable "secret_key" {
+  description = "The key used to decrypt sensitive information during the deployment process. Defaults to a generated value"
+  type = string
+  default = ""
+}
 resource "random_password" "secret_key" {
   length = 16
 }
@@ -73,7 +79,8 @@ resource "null_resource" "circleci_context_variables" {
     values_file = file(var.silta_cluster_helm_local_values)
     db_root_pass = random_password.db_root_pass.result
     db_user_pass = random_password.db_user_pass.result
-    secret_key = random_password.secret_key.result
+    secret_key_var = var.secret_key
+    secret_key_generated = random_password.secret_key.result
     version = 2
   }
 
@@ -99,7 +106,7 @@ printf "${yamldecode(file(var.silta_cluster_helm_local_values)).sshKeyServer.api
 printf "${yamldecode(file(var.silta_cluster_helm_local_values)).sshKeyServer.apiPassword}" | circleci context store-secret ${var.circleci_vcs_type} ${var.circleci_org_name} ${var.circleci_context_name} GITAUTH_PASSWORD
 
 # The default key used to encrypt secrets.
-printf "${random_password.secret_key.result}" | circleci context store-secret ${var.circleci_vcs_type} ${var.circleci_org_name} ${var.circleci_context_name} SECRET_KEY
+printf "${var.secret_key != "" ? var.secret_key : random_password.secret_key.result}" | circleci context store-secret ${var.circleci_vcs_type} ${var.circleci_org_name} ${var.circleci_context_name} SECRET_KEY
 EOF
   }
 }
