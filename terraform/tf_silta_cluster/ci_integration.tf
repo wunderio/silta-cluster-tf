@@ -58,11 +58,23 @@ resource "random_password" "secret_key" {
   length = 16
 }
 
-resource "null_resource" "circleci_context_credential_variables" {
+resource "null_resource" "circleci_context_variables" {
   depends_on = [null_resource.circleci_context]
 
   triggers = {
-    version = 6
+    project_id = var.project_id
+    cluster_name = var.cluster_name
+    circleci_vs_type = var.circleci_vcs_type
+    circleci_org_name = var.circleci_org_name
+    circleci_context_name = var.circleci_context_name
+    private_key = google_service_account_key.silta_ci_key.private_key
+    registry_location = google_container_registry.registry.location
+    cluster_location = google_container_cluster.silta_cluster.location
+    values_file = file(var.silta_cluster_helm_local_values)
+    db_root_pass = random_password.db_root_pass.result
+    db_user_pass = random_password.db_user_pass.result
+    secret_key = random_password.secret_key.result
+    version = 2
   }
 
   provisioner "local-exec" {
@@ -74,19 +86,7 @@ printf '%s' '${base64decode(google_service_account_key.silta_ci_key.private_key)
 printf "${var.project_id}" | circleci context store-secret ${var.circleci_vcs_type} ${var.circleci_org_name} ${var.circleci_context_name} DOCKER_REPO_PROJ
 printf "${lower(google_container_registry.registry.location)}.gcr.io" | circleci context store-secret ${var.circleci_vcs_type} ${var.circleci_org_name} ${var.circleci_context_name} DOCKER_REPO_HOST
 printf "${google_container_cluster.silta_cluster.location}" | circleci context store-secret ${var.circleci_vcs_type} ${var.circleci_org_name} ${var.circleci_context_name} GCLOUD_COMPUTE_REGION
-EOF
-  }
-}
 
-resource "null_resource" "circleci_context_variables" {
-  depends_on = [null_resource.circleci_context]
-
-  triggers = {
-    version = 2
-  }
-
-  provisioner "local-exec" {
-    command = <<EOF
 # The default cluster domain.
 printf "${yamldecode(file(var.silta_cluster_helm_local_values)).clusterDomain}" | circleci context store-secret ${var.circleci_vcs_type} ${var.circleci_org_name} ${var.circleci_context_name} CLUSTER_DOMAIN
 
