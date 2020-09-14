@@ -32,8 +32,9 @@ resource "google_service_account" "silta_ci" {
 }
 
 resource "google_project_iam_member" "silta_ci_cluster_access" {
-  role    = "roles/container.developer"
-  member  = "serviceAccount:${google_service_account.silta_ci.email}"
+  // TODO: define a custom role with more limited permissions.
+  role   = "roles/container.admin"
+  member = "serviceAccount:${google_service_account.silta_ci.email}"
 }
 
 resource "google_storage_bucket_iam_member" "silta_ci_registry_access" {
