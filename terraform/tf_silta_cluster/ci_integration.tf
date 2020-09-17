@@ -65,6 +65,12 @@ resource "random_password" "secret_key" {
   length = 16
 }
 
+variable "vpn_ip" {
+  description = "The IP from which basic auth is bypassed."
+  type = string
+  default = ""
+}
+
 resource "null_resource" "circleci_context_variables" {
   depends_on = [null_resource.circleci_context]
 
@@ -82,6 +88,7 @@ resource "null_resource" "circleci_context_variables" {
     db_user_pass = random_password.db_user_pass.result
     secret_key_var = var.secret_key
     secret_key_generated = random_password.secret_key.result
+    vpn_ip = var.vpn_ip
     version = 2
   }
 
@@ -108,6 +115,9 @@ printf "${yamldecode(file(var.silta_cluster_helm_local_values)).sshKeyServer.api
 
 # The default key used to encrypt secrets.
 printf "${var.secret_key != "" ? var.secret_key : random_password.secret_key.result}" | circleci context store-secret ${var.circleci_vcs_type} ${var.circleci_org_name} ${var.circleci_context_name} SECRET_KEY
+
+# The IP from which basic auth is bypassed.
+printf "${var.vpn_ip}" | circleci context store-secret ${var.circleci_vcs_type} ${var.circleci_org_name} ${var.circleci_context_name} VPN_IP
 EOF
   }
 }
