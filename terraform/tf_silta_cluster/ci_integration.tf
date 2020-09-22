@@ -36,6 +36,10 @@ resource "google_project_iam_member" "silta_ci_cluster_access" {
   role   = "roles/container.admin"
   member = "serviceAccount:${google_service_account.silta_ci.email}"
 }
+resource "google_project_iam_member" "silta_ci_secret_manager_access" {
+  role   = "roles/secretmanager.secretAccessor"
+  member = "serviceAccount:${google_service_account.silta_ci.email}"
+}
 
 resource "google_storage_bucket_iam_member" "silta_ci_registry_access" {
   bucket = google_container_registry.registry.id
