@@ -146,6 +146,11 @@ resource "google_container_node_pool" "static_ip" {
       "https://www.googleapis.com/auth/logging.write",
       "https://www.googleapis.com/auth/monitoring",
     ]
+   	taint {
+			key = "cloud.google.com/gke-nodepool"
+			value = "static-ip"
+			effect = "NO_SCHEDULE"
+		}
   }
 
   depends_on = [google_container_cluster.silta_cluster]
