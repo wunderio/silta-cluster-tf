@@ -86,6 +86,8 @@ resource "google_container_cluster" "silta_cluster" {
   location = var.cluster_location
   remove_default_node_pool = true
   initial_node_count = 1
+  networking_mode = "VPC_NATIVE"
+  ip_allocation_policy {}
 
   release_channel {
     channel = "REGULAR"
