@@ -172,6 +172,7 @@ resource "null_resource" "static_ip_node_assignment" {
   }
 
   provisioner "local-exec" {
+    interpreter = ["/bin/bash", "-c"]
     command = <<EOF
 
 static_ip_addresses=(${join(" ", [for address in google_compute_address.static_egress: address.address])})
