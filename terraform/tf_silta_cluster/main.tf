@@ -153,8 +153,10 @@ resource "google_container_node_pool" "static_ip" {
 			value = "static-ip"
 			effect = "NO_SCHEDULE"
 		}
+    labels = {
+      "cloud.google.com/gke-nodepool" = "static-ip"
+    }
   }
-
   depends_on = [google_container_cluster.silta_cluster]
 }
 
